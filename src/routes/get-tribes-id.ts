@@ -1,12 +1,12 @@
 import { FastifyInstance, RouteOptions } from "fastify";
 import { ResourceNotFoundError } from "../errors/resource-not-found";
-import * as employeesModel from "../models/employees.model";
+import * as tribesModel from "../models/tribes.model";
 import { IdParamsSchema, IdParamsType } from "./schemas";
 
 export default function (fastify: FastifyInstance): RouteOptions {
   return {
     method: "GET",
-    url: "/api/employees/:id",
+    url: "/api/tribes/:id",
     schema: {
       params: IdParamsSchema,
     },
@@ -14,8 +14,8 @@ export default function (fastify: FastifyInstance): RouteOptions {
       const params = request.params as IdParamsType;
 
       try {
-        const employee = await employeesModel.getEmployee(fastify, params.id);
-        reply.code(200).send(employee);
+        const tribe = await tribesModel.getTribe(fastify, params.id);
+        reply.code(200).send(tribe);
       } catch (error) {
         if (error instanceof ResourceNotFoundError) {
           reply.code(404).send({ error: error.message });

@@ -1,5 +1,6 @@
 import { FastifyInstance } from "fastify";
-import { EmployeeBodyType } from "../routes/schemas";
+import { ResourceNotFoundError } from "../errors/resource-not-found";
+import { EmployeeBodyType, searchQueryType } from "../routes/schemas";
 import { Tribe } from "./tribes.model";
 
 interface EmployeeDTO {
@@ -36,9 +37,10 @@ const toEmployeeDTO = (employee: EmployeeQueryResult): EmployeeDTO => {
 };
 
 export async function getEmployees(
-  fastify: FastifyInstance
+  fastify: FastifyInstance,
+  searchQuery: searchQueryType
 ): Promise<EmployeeDTO[]> {
-  const employeesQuery = await fastify.db
+  const employeesQuery = fastify.db
     .from(TABLE_NAME)
     .innerJoin("tribes", "tribes.id", "employees.tribe_id")
     .select(
@@ -50,13 +52,21 @@ export async function getEmployees(
       "tribes.department as tribe.department"
     );
 
-  const employees: EmployeeDTO[] = employeesQuery.map(toEmployeeDTO);
+  if (searchQuery.name)
+    employeesQuery.whereILike("employees.name", `%${searchQuery.name}%`);
+  if (searchQuery.title)
+    employeesQuery.where({ "employees.title": searchQuery.title });
+  if (searchQuery.tribe)
+    employeesQuery.where({ "tribes.name": searchQuery.tribe });
+
+  const employeesQueryResult = await employeesQuery.then();
+  const employees: EmployeeDTO[] = employeesQueryResult.map(toEmployeeDTO);
 
   return employees;
 }
 
 export async function getEmployee(fastify: FastifyInstance, id: number) {
-  const employeeQuery = await fastify.db
+  const employeeQueryResult = await fastify.db
     .from(TABLE_NAME)
     .select(
       "employees.id as id",
@@ -67,10 +77,15 @@ export async function getEmployee(fastify: FastifyInstance, id: number) {
       "tribes.department as tribe.department"
     )
     .innerJoin("tribes", "tribes.id", "employees.tribe_id")
-    .where({ id })
+    .where({ "employees.id": id })
     .first();
 
-  return toEmployeeDTO(employeeQuery);
+  if (!employeeQueryResult) {
+    const message = `No employee with id ${id} is found`;
+    throw new ResourceNotFoundError(message);
+  }
+
+  return toEmployeeDTO(employeeQueryResult);
 }
 
 export async function createEmployee(
