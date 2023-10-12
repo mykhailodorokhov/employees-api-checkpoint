@@ -3,10 +3,9 @@ import path from "path";
 import fileKnexConfigs from "../../knexconfig";
 
 type envType = "development" | "production";
+const env = (process.env.ENVIRONMENT as envType) ?? "development";
 
 function getKnexConfig() {
-  const env = (process.env.ENVIRONMENT as envType) ?? "development";
-
   const fileKnexConfig: Knex.Config = fileKnexConfigs[env];
 
   const knexConfig = {

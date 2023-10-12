@@ -6,7 +6,7 @@ export default {
       host: "localhost",
       user: "root",
       password: "password",
-      database: "stars",
+      database: "employees",
     },
   },
   production: {
