@@ -1,21 +1,29 @@
 import { FastifyInstance } from "fastify";
 import { EmployeeBodyType } from "../routes/schemas";
 
+const TABLE_NAME = "employees";
+
 export async function getEmployees(fastify: FastifyInstance) {
-  throw new Error("not implemented");
+  const employees = await fastify.db.from(TABLE_NAME).select();
+  return employees;
 }
 
 export async function getEmployee(fastify: FastifyInstance, id: number) {
-  throw new Error("not implemented");
+  const employees = await fastify.db
+    .from(TABLE_NAME)
+    .where({ id })
+    .select()
+    .first();
+  return employees;
 }
 
 export async function createEmployee(
   fastify: FastifyInstance,
   employee: EmployeeBodyType
 ) {
-  throw new Error("not implemented");
+  await fastify.db.from(TABLE_NAME).insert(employee);
 }
 
 export async function deleteEmployee(fastify: FastifyInstance, id: number) {
-  throw new Error("not implemented");
+  await fastify.db.from(TABLE_NAME).where({ id }).del();
 }
