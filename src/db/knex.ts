@@ -1,24 +1,29 @@
 import knex, { Knex } from "knex";
 import path from "path";
+import fileKnexConfigs from "../../knexconfig";
 
-const config: Knex.Config = {
-  client: "mysql2",
-  version: "8.0",
-  migrations: {
-    directory: path.join(process.cwd(), "src", "db", "migrations"),
-  },
-  seeds: {
-    directory: path.join(process.cwd(), "src", "db", "seeds"),
-  },
-  connection: {
-    host: "localhost",
-    user: "root",
-    password: "password",
-    database: "employees",
-  },
-};
+type envType = "development" | "production";
+
+function getKnexConfig() {
+  const env = (process.env.ENVIRONMENT as envType) ?? "development";
+
+  const fileKnexConfig: Knex.Config = fileKnexConfigs[env];
+
+  const knexConfig = {
+    ...fileKnexConfig,
+    migrations: {
+      directory: path.join(process.cwd(), "src", "db", "migrations"),
+    },
+    seeds: {
+      directory: path.join(process.cwd(), "src", "db", "seeds"),
+    },
+  };
+
+  return knexConfig;
+}
 
 export default function () {
+  const config = getKnexConfig();
   const knexInstance = knex(config);
   console.log(`💽 database connection via knex initialized\n`);
 
