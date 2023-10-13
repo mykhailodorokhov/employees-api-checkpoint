@@ -6,6 +6,7 @@ const env = (process.env.ENVIRONMENT as envType) ?? "development";
 
 async function createDatabase() {
   const knexConfig = fileKnexConfigs[env];
+
   const dbName = knexConfig.connection.database;
   knexConfig.connection.database = undefined;
 
