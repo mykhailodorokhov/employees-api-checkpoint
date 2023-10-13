@@ -21,6 +21,8 @@ interface EmployeeQueryResult {
 
 const TABLE_NAME = "employees";
 
+const EMPLOYEES_REPORT_CACHE_KEY = "employees_report";
+
 const toEmployeeDTO = (employee: EmployeeQueryResult): EmployeeDTO => {
   const employeeDTO: EmployeeDTO = {
     id: employee.id,
@@ -93,8 +95,10 @@ export async function createEmployee(
   employee: EmployeeBodyType
 ) {
   await fastify.db.from(TABLE_NAME).insert(employee);
+  await fastify.cache.del(EMPLOYEES_REPORT_CACHE_KEY);
 }
 
 export async function deleteEmployee(fastify: FastifyInstance, id: number) {
   await fastify.db.from(TABLE_NAME).where({ id }).del();
+  await fastify.cache.del(EMPLOYEES_REPORT_CACHE_KEY);
 }
