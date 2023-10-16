@@ -55,7 +55,7 @@ export async function getEmployees(
     );
 
   if (searchQuery.name)
-    employeesQuery.whereILike("employees.name", `%${searchQuery.name}%`);
+    employeesQuery.whereLike("employees.name", `%${searchQuery.name}%`);
   if (searchQuery.title)
     employeesQuery.where({ "employees.title": searchQuery.title });
   if (searchQuery.tribe)
