@@ -1,4 +1,4 @@
-import getKnexInstance from "../knex";
+import getKnexInstance from "../src/db/knex";
 
 async function migrateDatabase() {
   const knexInstance = getKnexInstance();

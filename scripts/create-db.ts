@@ -1,5 +1,5 @@
 import knex from "knex";
-import fileKnexConfigs from "../../../knexconfig";
+import fileKnexConfigs from "../knexconfig";
 
 type envType = "development" | "production";
 const env = (process.env.ENVIRONMENT as envType) ?? "development";
