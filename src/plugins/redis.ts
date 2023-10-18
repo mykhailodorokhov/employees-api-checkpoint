@@ -2,20 +2,25 @@ import { FastifyInstance } from "fastify";
 import fp from "fastify-plugin";
 import * as Redis from "redis";
 import * as RedisMock from "redis-mock";
+import { envType } from "../app";
 
-type envType = "development" | "production" | "test";
-const env = (process.env.ENVIRONMENT as envType) ?? "development";
-const redisHost = process.env.REDIS_HOST ?? "localhost";
+interface redisPluginOptions {
+  environment: envType;
+  redisHost: string;
+}
 
-async function redisPlugin(fastify: FastifyInstance) {
-  if (env === "test") {
+async function redisPlugin(
+  fastify: FastifyInstance,
+  options: redisPluginOptions
+) {
+  if (options.environment === "test") {
     const redis = RedisMock.createClient();
     fastify.decorate("cache", redis);
     console.log(`📝 Redis-mock connected\n`);
 
     return;
   }
-  const url = `redis://${redisHost}:6379`;
+  const url = `redis://${options.redisHost}:6379`;
 
   const redis = Redis.createClient({ url });
   redis.connect();

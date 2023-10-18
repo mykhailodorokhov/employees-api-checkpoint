@@ -1,10 +1,15 @@
 import { FastifyInstance } from "fastify";
 import fp from "fastify-plugin";
 import { Knex } from "knex";
+import { envType } from "../app";
 import getKnexInstance from "../db/knex";
 
-async function knexPlugin(fastify: FastifyInstance) {
-  const knexInstance = getKnexInstance();
+interface knexPluginOption {
+  environment: envType;
+}
+
+async function knexPlugin(fastify: FastifyInstance, options: knexPluginOption) {
+  const knexInstance = getKnexInstance(options.environment);
   fastify.decorate("db", knexInstance);
 }
 

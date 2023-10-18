@@ -1,12 +1,10 @@
 import knex, { Knex } from "knex";
 import path from "path";
 import fileKnexConfigs from "../../knexconfig";
+import { envType } from "../app";
 
-type envType = "development" | "production" | "test";
-const env = (process.env.ENVIRONMENT as envType) ?? "development";
-
-function getKnexConfig() {
-  const fileKnexConfig: Knex.Config = fileKnexConfigs[env];
+function getKnexConfig(environment: envType) {
+  const fileKnexConfig: Knex.Config = fileKnexConfigs[environment];
 
   const knexConfig = {
     ...fileKnexConfig,
@@ -21,8 +19,8 @@ function getKnexConfig() {
   return knexConfig;
 }
 
-export default function () {
-  const config = getKnexConfig();
+export default function (environment: envType) {
+  const config = getKnexConfig(environment);
   const knexInstance = knex(config);
   console.log(`💽 database connection via knex initialized\n`);
 
